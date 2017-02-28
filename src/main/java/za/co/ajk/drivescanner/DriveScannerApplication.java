@@ -7,7 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import za.co.ajk.drivescanner.fileInfoHandlers.DirectoryScanner;
+import za.co.ajk.drivescanner.infohandlers.DirectoryScanner;
 
 @ComponentScan
 @EnableAutoConfiguration
