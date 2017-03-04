@@ -1,4 +1,4 @@
-package za.co.ajk.drivescanner;
+package za.co.ajk.drivescanner.exceptions;
 
 import org.springframework.boot.ExitCodeGenerator;
 

@@ -9,7 +9,7 @@
  *
  */
 
-package za.co.ajk.drivescanner.infohandlers;
+package za.co.ajk.drivescanner.scanners;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import za.co.ajk.drivescanner.dtos.FileEntryDTO;
 import za.co.ajk.drivescanner.dtos.ResultDirectoryStructure;
+import za.co.ajk.drivescanner.scanners.infohandlers.DirectoryInformationExtractor;
+import za.co.ajk.drivescanner.scanners.infohandlers.FileInformationExtractor;
+import za.co.ajk.drivescanner.translators.TranslateInformationImpl;
 import za.co.ajk.drivescanner.utilities.StringFormatters;
 
 import java.io.File;
@@ -42,6 +45,8 @@ public class FileSystemScanner {
     @Autowired
     private ResultDirectoryStructure resultDirectoryStructure;
 
+    @Autowired
+    private TranslateInformationImpl translateInformation;
 
     /**
      * Scan the input folder and return the list of directory file entries.
@@ -69,9 +74,10 @@ public class FileSystemScanner {
 
         for (Map.Entry<String, List<FileEntryDTO>> entry: directoryMap.entrySet()){
             logger.info("Key is > "+entry.getKey());
+
             for(FileEntryDTO dto: entry.getValue()){
-                logger.info("      dto.fileName : "+dto.getFileName());
-                logger.info("      dto.size     : "+dto.getFileSize());
+                String res =translateInformation.translateToXMLJaxb(dto);
+                logger.info(res);
             }
         }
         return filesList;

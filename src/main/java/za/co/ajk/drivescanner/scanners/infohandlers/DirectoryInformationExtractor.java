@@ -1,4 +1,4 @@
-package za.co.ajk.drivescanner.infohandlers;
+package za.co.ajk.drivescanner.scanners.infohandlers;
 
 import org.springframework.stereotype.Component;
 import za.co.ajk.drivescanner.dtos.DirectoryEntryDTO;
