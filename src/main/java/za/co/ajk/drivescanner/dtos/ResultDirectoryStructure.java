@@ -8,25 +8,25 @@ import java.util.*;
 public class ResultDirectoryStructure {
 
     /**
-     * Local data structure that will use the directory name as the key.
+     * Local data structure that will use the directory name as the key. Directory name is the unique key
      */
-    private Map<String, List<FileEntryDTO>> directoryMap = new TreeMap<>(
-            (o1, o2) -> o1.compareTo(o2)
+    private Map<DirectoryEntryDTO, List<? super BaseDTO>> directoryMap = new TreeMap<>(
+            (o1, o2) -> o1.getDirectoryName().compareTo(o2.getDirectoryName())
     );
 
     /**
      * Add and entry to a directory if the directory exists
      *
-     * @param directoryName
-     * @param fileEntryDTO
+     * @param directoryDTO
+     * @param <?            extends BaseDTO>
      */
-    public void addEntry(String directoryName, FileEntryDTO fileEntryDTO) {
+    public void addEntry(DirectoryEntryDTO directoryDTO, BaseDTO<? extends BaseDTO> dto) {
 
-        if (directoryMap.containsKey(directoryName)) {
-            directoryMap.get(directoryName).add(fileEntryDTO);
+        if (directoryMap.containsKey(directoryDTO)) {
+              directoryMap.get(directoryDTO).add(dto);
         } else {
-            List<FileEntryDTO> fileList = new ArrayList<>(Arrays.asList(fileEntryDTO));
-            directoryMap.put(directoryName, fileList);
+            List<? super BaseDTO> fileList = new ArrayList<>(Arrays.asList(dto));
+            directoryMap.put(directoryDTO, fileList);
         }
     }
 
@@ -35,7 +35,7 @@ public class ResultDirectoryStructure {
      *
      * @return
      */
-    public Map<String, List<FileEntryDTO>> getFullStructure() {
+    public Map<DirectoryEntryDTO, List<? super BaseDTO>> getFullStructure() {
         return directoryMap;
     }
 }

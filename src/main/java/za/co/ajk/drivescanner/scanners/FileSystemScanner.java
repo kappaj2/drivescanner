@@ -1,22 +1,10 @@
-/*
- *
- *  * Copyright (c) PCMS Group plc 2016. All Rights Reserved.
- *  * This source code is copyright of PCMS Group plc. The information
- *  * contained herein is proprietary and confidential to PCMS Group plc.
- *  * This proprietary and confidential information, either in whole or in
- *  * part, shall not be used for any purpose unless permitted by the terms
- *  * of a valid license agreement.
- *
- */
-
 package za.co.ajk.drivescanner.scanners;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import za.co.ajk.drivescanner.dtos.FileEntryDTO;
-import za.co.ajk.drivescanner.dtos.ResultDirectoryStructure;
+import za.co.ajk.drivescanner.dtos.*;
 import za.co.ajk.drivescanner.scanners.infohandlers.DirectoryInformationExtractor;
 import za.co.ajk.drivescanner.scanners.infohandlers.FileInformationExtractor;
 import za.co.ajk.drivescanner.translators.TranslateInformationImpl;
@@ -48,6 +36,9 @@ public class FileSystemScanner {
     @Autowired
     private TranslateInformationImpl translateInformation;
 
+    @Autowired
+    private DirectoryStructureMap directoryStructureMap;
+
     /**
      * Scan the input folder and return the list of directory file entries.
      *
@@ -69,15 +60,35 @@ public class FileSystemScanner {
 
         logger.info("Final size is >" + filesList.size());
 
+        /*
+            Dump the structure to logfile for now..
+         */
+        logger.info("Starting to dump final structure");
 
-        Map<String, List<FileEntryDTO>> directoryMap = resultDirectoryStructure.getFullStructure();
+        logger.info("Dumping directory map");
+        Set<String> dirSet = directoryStructureMap.getDirectorySet();
 
-        for (Map.Entry<String, List<FileEntryDTO>> entry: directoryMap.entrySet()){
-            logger.info("Key is > "+entry.getKey());
+        for (String setEntry:dirSet){
+            logger.info("  :> "+setEntry);
+        }
 
-            for(FileEntryDTO dto: entry.getValue()){
-                String res =translateInformation.translateToXMLJaxb(dto);
-                logger.info(res);
+        Map<DirectoryEntryDTO, List<? super BaseDTO>> directoryMap = resultDirectoryStructure.getFullStructure();
+
+        for (Map.Entry<DirectoryEntryDTO, List<? super BaseDTO>> entry : directoryMap.entrySet()) {
+
+            List<? super BaseDTO> values = entry.getValue();
+
+            for (Object listValue : values) {
+
+                if (listValue instanceof FileEntryDTO) {
+                    String res = translateInformation.translateFileEntryDTOToXML((FileEntryDTO) listValue);
+                    logger.info(res);
+                }else if (listValue instanceof DirectoryEntryDTO) {
+                    String res = translateInformation.translateDirectoryEntryDTOToXML((DirectoryEntryDTO)listValue);
+                    logger.info(res);
+                } else {
+                    logger.info("Unknown entry type !!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+                }
             }
         }
         return filesList;
@@ -94,7 +105,7 @@ public class FileSystemScanner {
     public void addFiles(File startMountPoint, List<File> fileList) {
 
         if (startMountPoint.listFiles() == null) {
-            logger.info("Mount point is null. Mount point name is : "+startMountPoint.getName());
+            logger.info("Mount point is null. Mount point name is : " + startMountPoint.getName());
             return;
         }
 
@@ -108,17 +119,28 @@ public class FileSystemScanner {
 
                 File file = directoryFiles.get(ii);
                 String parent = file.getParent();
+                File parentFile = file;
 
                 if (file.isDirectory()) {
 
                     addFiles(file, fileList);
 
-                } else if (directoryFiles.get(ii).isFile() ) {
+                    /*
+                        Add to final result structure
+                     */
+                    directoryStructureMap.addEntry(file.getAbsolutePath());
+                    DirectoryEntryDTO dirDTO = directoryInformationExtractor.extractDirectoryInformation(file);
+                    resultDirectoryStructure.addEntry(dirDTO, directoryInformationExtractor.extractDirectoryInformation(file));
 
-                    if(!file.isHidden()) {
+                } else if (directoryFiles.get(ii).isFile()) {
 
-                        FileEntryDTO fileDTO = fileInformationExtractor.extractFileInfomation(file);
-                        resultDirectoryStructure.addEntry(parent, fileDTO);
+                    if (!file.isHidden()) {
+
+                        /*
+                            Add to final result structure
+                         */
+                        DirectoryEntryDTO parentDTO = directoryInformationExtractor.extractDirectoryInformation(parentFile);
+                        resultDirectoryStructure.addEntry(parentDTO, fileInformationExtractor.extractFileInfomation(file));
                     }
 
                     fileList.add(file);
@@ -126,11 +148,9 @@ public class FileSystemScanner {
             }
         } else if (startMountPoint.isFile()) {
 
-            FileEntryDTO fileDTO = fileInformationExtractor.extractFileInfomation(startMountPoint);
-            logger.info("FileDTO is : "+fileDTO.toString());
-
-            logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4");
-            fileList.add(startMountPoint);
+            logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+            logger.info("$$$$   Start at a mountpoint and not a file $$$$");
+            logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
         } else {
             logger.error("Cannot determine : " + startMountPoint.getName());

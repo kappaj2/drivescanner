@@ -36,7 +36,7 @@ public class FileInformationExtractor {
 
             Path path = file.toPath();
 
-            logger.info("File name : "+file.getCanonicalPath());
+ //           logger.info("File name : "+file.getCanonicalPath());
 
 
             BasicFileAttributeView attributes = Files.getFileAttributeView(path, BasicFileAttributeView.class, java.nio.file.LinkOption.NOFOLLOW_LINKS);

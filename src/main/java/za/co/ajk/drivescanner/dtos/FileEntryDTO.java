@@ -4,9 +4,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+@lombok.ToString
+@lombok.EqualsAndHashCode
 @XmlRootElement(name = "FILE_ENTRY")
 @XmlType(propOrder = {"fileName", "fileSize"})
-public class FileEntryDTO {
+public final class FileEntryDTO extends BaseDTO<FileEntryDTO> {
 
     private String fileName;
     private Long fileSize;

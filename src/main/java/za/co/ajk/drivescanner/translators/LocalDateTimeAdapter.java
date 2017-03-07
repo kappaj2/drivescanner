@@ -4,6 +4,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Customer XML Adapater until JAXB supports Java8 LocalDateTime.
+ */
 public class LocalDateTimeAdapter extends XmlAdapter<String, LocalDateTime> {
 
     @Override

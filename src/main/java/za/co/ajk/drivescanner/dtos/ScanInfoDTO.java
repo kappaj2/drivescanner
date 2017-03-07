@@ -4,16 +4,16 @@ package za.co.ajk.drivescanner.dtos;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import za.co.ajk.drivescanner.translators.LocalDateTimeAdapter;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDateTime;
 
+@lombok.ToString
+@lombok.EqualsAndHashCode
 @XmlRootElement(name = "FILE_ENTRY")
 @XmlType(propOrder = {"scannedFolder", "dateFolderScanStarted", "dateFolderScanCompleted"})
-public final class ScanInfoDTO {
+public final class ScanInfoDTO extends BaseDTO<ScanInfoDTO>{
 
     private String scannedFolder;
 
